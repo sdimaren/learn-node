@@ -28,10 +28,7 @@ exports.upload = multer(multerOptions).single('photo');
 
 exports.resize = async (req, res, next) => {
   // check if there is no new file to resize
-  if (!req.file) {
-    next(); // skip to the next middleware
-    return;
-  }
+  if (!req.file) return next(); // skip to the next middleware
   const extension = req.file.mimetype.split('/')[1];
   req.body.photo = `${uuid.v4()}.${extension}`;
   // now we resize
@@ -75,3 +72,9 @@ exports.updateStore = async (req, res) => {
   res.redirect(`/stores/${store._id}/edit`);
   // Redriect them the store and tell them it worked
 };
+
+exports.getStoreBySlug = async (req, res, next) => {
+	const store = await Store.findOne({ slug: req.params.slug });
+	if(!store) return next();
+	res.render('store', { store, title: store.name });
+}
